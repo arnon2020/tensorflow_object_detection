@@ -1,0 +1,32 @@
+from google.colab import drive
+drive.mount('/drive')
+
+!pwd
+
+cd ..
+
+cd drive/My Drive/AI_temp_data/retrain
+
+! wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+! unzip ngrok-stable-linux-amd64.zip
+
+import os
+LOG_DIR = '/drive/My Drive/AI_temp_data/retrain/training'
+cmd ="tensorboard --logdir '{}' --host 0.0.0.0 --port 6006 &".format(LOG_DIR)
+os.system(cmd)
+
+get_ipython().system_raw('./ngrok http 6006 &')
+
+! curl -s http://localhost:4040/api/tunnels | python3 -c \
+    "import sys, json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])"
+
+!python train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/faster_rcnn_inception_v2_pets.config
+
+!top
+
+!kill 3622
+
+AI_temp_data.zip:https://drive.google.com/file/d/1xWDItkx-Qg7_qyW92-tMGJPMJLcLbKMD/view?usp=sharing
+
+
+
